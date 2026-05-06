@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LOA OIL — 定義できない美へ</title>
+  <style>
+    /* ベースリセット */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #080808;
+      --deep-navy: #0a0d14;
+      --burgundy: #2a0a0f;
+      --gold: #b8965a;
+      --gold-light: #d4af72;
+      --white: #f0ede8;
+      --gray: #6a6460;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--black);
+      color: var(--white);
+      font-family: 'Georgia', '游明朝', 'Yu Mincho', 'YuMincho', serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* カスタムカーソル */
+    .cursor {
+      width: 8px;
+      height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease;
+    }
+    .cursor-ring {
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(184,150,90,0.4);
+      border-radius: 50%;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.4s ease, width 0.3s ease, height 0.3s ease;
+    }
+
+    /* ────────────────────────────────────────
+       ① ファーストビュー
+    ──────────────────────────────────────── */
+    #fv {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: 700px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #fv .fv-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('fv/11.png');
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.05);
+      transition: transform 8s ease;
+    }
+    #fv.loaded .fv-bg { transform: scale(1); }
+
+    /* 暗幕オーバーレイ */
+    #fv::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(8,8,8,0.3) 0%,
+        rgba(8,8,8,0.1) 40%,
+        rgba(8,8,8,0.5) 80%,
+        rgba(8,8,8,0.95) 100%
+      );
+    }
+
+    .fv-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 24px;
+    }
+
+    .fv-label {
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      color: var(--gold);
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 1.2s ease 0.5s forwards;
+    }
+
+    .fv-copy {
+      font-size: clamp(28px, 5vw, 52px);
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      line-height: 1.6;
+      color: var(--white);
+      opacity: 0;
+      animation: fadeUp 1.4s ease 0.9s forwards;
+    }
+
+    .fv-copy span {
+      display: block;
+      font-size: clamp(13px, 1.8vw, 18px);
+      letter-spacing: 0.3em;
+      color: rgba(240,237,232,0.5);
+      margin-top: 20px;
+      font-style: italic;
+    }
+
+    .fv-scroll {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      animation: fadeUp 1s ease 2s forwards;
+    }
+    .fv-scroll span {
+      font-size: 9px;
+      letter-spacing: 0.4em;
+      color: var(--gold);
+    }
+    .scroll-line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollLine 2s ease-in-out infinite;
+    }
+    @keyframes scrollLine {
+      0% { transform: scaleY(0); transform-origin: top; }
+      50% { transform: scaleY(1); transform-origin: top; }
+      51% { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ────────────────────────────────────────
+       ② ブランドストーリー
+    ──────────────────────────────────────── */
+    #story {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+
+    .story-visual {
+      position: relative;
+      overflow: hidden;
+    }
+    .story-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.7);
+    }
+    .story-visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, transparent 70%, var(--black));
+    }
+
+    .story-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 60px;
+      background: var(--black);
+    }
+
+    .section-label {
+      font-size: 9px;
+      letter-spacing: 0.5em;
+      color: var(--gold);
+      margin-bottom: 40px;
+      text-transform: uppercase;
+    }
+
+    .story-heading {
+      font-size: clamp(22px, 3vw, 36px);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      line-height: 1.8;
+      margin-bottom: 40px;
+    }
+
+    .story-body {
+      font-size: clamp(13px, 1.2vw, 15px);
+      line-height: 2.4;
+      color: rgba(240,237,232,0.6);
+      letter-spacing: 0.05em;
+    }
+
+    .gold-line {
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+      margin: 40px 0;
+    }
+
+    /* ────────────────────────────────────────
+       ③ コンセプト
+    ──────────────────────────────────────── */
+    #concept {
+      padding: 120px 0;
+      background: var(--deep-navy);
+      overflow: hidden;
+    }
+
+    .concept-header {
+      text-align: center;
+      margin-bottom: 100px;
+      padding: 0 24px;
+    }
+
+    .concept-header h2 {
+      font-size: clamp(32px, 5vw, 60px);
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      line-height: 1.4;
+    }
+
+    .concept-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: rgba(184,150,90,0.15);
+    }
+
+    .concept-item {
+      background: var(--deep-navy);
+      padding: 60px 40px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.6s ease;
+    }
+    .concept-item:hover { background: rgba(42,10,15,0.8); }
+
+    .concept-item .bg-img {
+      position: absolute;
+      inset: 0;
+      background-image: url('concept/13.png');
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      filter: brightness(0.3);
+    }
+    .concept-item:nth-child(2) .bg-img { background-position: 33% center; }
+    .concept-item:nth-child(3) .bg-img { background-position: 66% center; }
+    .concept-item:hover .bg-img { opacity: 1; }
+
+    .concept-number {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      margin-bottom: 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .concept-word {
+      font-size: clamp(28px, 3.5vw, 48px);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .concept-ja {
+      font-size: 12px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      margin-bottom: 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .concept-desc {
+      font-size: 13px;
+      line-height: 2.2;
+      color: rgba(240,237,232,0.55);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ────────────────────────────────────────
+       ④ プロダクト提示
+    ──────────────────────────────────────── */
+    #product {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: var(--black);
+    }
+
+    .product-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('product/14.png');
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.5);
+    }
+
+    .product-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 600px;
+      padding: 0 24px;
+    }
+
+    .product-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.5em;
+      color: var(--gold);
+      margin-bottom: 60px;
+    }
+
+    .product-copy {
+      font-size: clamp(28px, 5vw, 56px);
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      line-height: 1.5;
+      margin-bottom: 32px;
+    }
+
+    .product-sub {
+      font-size: 13px;
+      letter-spacing: 0.25em;
+      color: rgba(240,237,232,0.5);
+      font-style: italic;
+      line-height: 2;
+    }
+
+    /* ────────────────────────────────────────
+       ⑤ 使用体験
+    ──────────────────────────────────────── */
+    #texture {
+      position: relative;
+      min-height: 80vh;
+      overflow: hidden;
+    }
+
+    .texture-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('texture/15.png');
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.1);
+      transition: transform 0.1s linear;
+    }
+
+    .texture-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(8,8,8,0.7) 0%,
+        rgba(8,8,8,0.2) 50%,
+        rgba(8,8,8,0.7) 100%
+      );
+    }
+
+    .texture-content {
+      position: relative;
+      z-index: 2;
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 80px clamp(24px, 8vw, 120px);
+    }
+
+    .texture-text {
+      max-width: 400px;
+      text-align: right;
+    }
+
+    .texture-text .section-label { text-align: right; }
+
+    .texture-heading {
+      font-size: clamp(24px, 3.5vw, 42px);
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      line-height: 1.8;
+      margin-bottom: 32px;
+    }
+
+    .texture-body {
+      font-size: 13px;
+      line-height: 2.4;
+      color: rgba(240,237,232,0.55);
+      letter-spacing: 0.05em;
+    }
+
+    /* ────────────────────────────────────────
+       ⑥ エビデンス
+    ──────────────────────────────────────── */
+    #ingredient {
+      padding: 120px clamp(24px, 8vw, 120px);
+      background: var(--black);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .ingredient-visual {
+      position: relative;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+    }
+
+    .ingredient-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.65) saturate(0.8);
+    }
+
+    .ingredient-visual::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border: 1px solid rgba(184,150,90,0.2);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .ingredient-text .section-label { margin-bottom: 48px; }
+
+    .ingredient-heading {
+      font-size: clamp(22px, 2.8vw, 36px);
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      line-height: 1.8;
+      margin-bottom: 40px;
+    }
+
+    .ingredient-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .ingredient-list li {
+      padding-left: 20px;
+      border-left: 1px solid rgba(184,150,90,0.4);
+      font-size: 13px;
+      line-height: 2.2;
+      color: rgba(240,237,232,0.6);
+      letter-spacing: 0.05em;
+    }
+
+    .ingredient-list li strong {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      margin-bottom: 4px;
+      font-weight: 400;
+    }
+
+    /* ────────────────────────────────────────
+       ⑦ 社会的証明
+    ──────────────────────────────────────── */
+    #testimonial {
+      padding: 120px 0;
+      background: var(--burgundy);
+      overflow: hidden;
+    }
+
+    .testimonial-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 600px;
+    }
+
+    .testimonial-visual {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .testimonial-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top;
+      filter: brightness(0.75) saturate(0.7);
+    }
+
+    .testimonial-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 60px;
+    }
+
+    .testimonial-quote {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+
+    .testimonial-attr {
+      font-size: 11px;
+      letter-spacing: 0.4em;
+      color: var(--gold);
+    }
+
+    .testimonial-sub {
+      margin-top: 60px;
+      padding-top: 60px;
+      border-top: 1px solid rgba(184,150,90,0.2);
+    }
+
+    .testimonial-sub p {
+      font-size: 13px;
+      line-height: 2.4;
+      color: rgba(240,237,232,0.5);
+      font-style: italic;
+      letter-spacing: 0.05em;
+    }
+
+    /* ────────────────────────────────────────
+       ⑧ CTA
+    ──────────────────────────────────────── */
+    #cta {
+      position: relative;
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .cta-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('bg/18.png');
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.35);
+    }
+
+    .cta-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(42,10,15,0.4) 0%, rgba(8,8,8,0.8) 100%);
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 24px;
+    }
+
+    .cta-label {
+      font-size: 10px;
+      letter-spacing: 0.5em;
+      color: var(--gold);
+      margin-bottom: 48px;
+    }
+
+    .cta-copy {
+      font-size: clamp(28px, 5vw, 56px);
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      line-height: 1.6;
+      margin-bottom: 64px;
+    }
+
+    .cta-price {
+      font-size: 12px;
+      letter-spacing: 0.3em;
+      color: rgba(240,237,232,0.4);
+      margin-bottom: 32px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 22px 64px;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: 'Georgia', '游明朝', serif;
+      font-size: 12px;
+      letter-spacing: 0.5em;
+      text-decoration: none;
+      transition: background 0.5s ease, color 0.5s ease;
+      cursor: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+      z-index: -1;
+    }
+
+    .btn-primary:hover { color: var(--black); }
+    .btn-primary:hover::before { transform: translateX(0); }
+
+    /* ────────────────────────────────────────
+       ⑨ 補足情報
+    ──────────────────────────────────────── */
+    #trust {
+      padding: 80px clamp(24px, 8vw, 120px);
+      background-image: url('bg/19.png');
+      background-size: cover;
+      background-position: center top;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* メインオーバーレイ */
+    #trust::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: rgba(8,8,8,0.94);
+    }
+
+    /* 右下イラストエリアを追加で隠す */
+    #trust::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 50%;
+      height: 70%;
+      z-index: 0;
+      background: radial-gradient(ellipse at bottom right, rgba(8,8,8,1) 40%, transparent 100%);
+    }
+
+    .trust-inner {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 40px;
+      border-top: 1px solid rgba(184,150,90,0.2);
+      border-bottom: 1px solid rgba(184,150,90,0.2);
+      padding: 60px 0;
+    }
+
+    .trust-item {
+      text-align: center;
+    }
+
+    .trust-icon {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .trust-title {
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      margin-bottom: 12px;
+    }
+
+    .trust-desc {
+      font-size: 11px;
+      line-height: 2;
+      color: rgba(240,237,232,0.5);
+      letter-spacing: 0.05em;
+    }
+
+    /* フッター */
+    footer {
+      padding: 40px 24px;
+      text-align: center;
+      background: var(--black);
+      border-top: 1px solid rgba(184,150,90,0.1);
+    }
+
+    footer p {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: rgba(240,237,232,0.2);
+    }
+
+    /* ────────────────────────────────────────
+       フェードインアニメーション
+    ──────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.15s; }
+    .reveal-delay-2 { transition-delay: 0.3s; }
+    .reveal-delay-3 { transition-delay: 0.45s; }
+
+    /* ────────────────────────────────────────
+       レスポンシブ（スマホ）
+    ──────────────────────────────────────── */
+    @media (max-width: 768px) {
+      body { cursor: auto; }
+      .cursor, .cursor-ring { display: none; }
+
+      #story {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+      .story-visual { height: 50vw; }
+      .story-visual::after { background: linear-gradient(to bottom, transparent 60%, var(--black)); }
+      .story-text { padding: 40px 24px 60px; }
+
+      .concept-grid {
+        grid-template-columns: 1fr;
+      }
+      .concept-item { padding: 48px 28px; }
+
+      #ingredient {
+        grid-template-columns: 1fr;
+        gap: 48px;
+        padding: 80px 24px;
+      }
+
+      .testimonial-inner {
+        grid-template-columns: 1fr;
+      }
+      .testimonial-visual { height: 60vw; }
+      .testimonial-text { padding: 48px 24px; }
+
+      .trust-inner {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+      }
+
+      .texture-content {
+        justify-content: center;
+        padding: 60px 24px;
+      }
+      .texture-text {
+        text-align: center;
+        max-width: 100%;
+      }
+      .texture-text .section-label { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- カスタムカーソル -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- ① ファーストビュー -->
+  <section id="fv">
+    <div class="fv-bg"></div>
+    <div class="fv-content">
+      <p class="fv-label">LOA OIL — BEAUTY REDEFINED</p>
+      <h1 class="fv-copy">
+        触れた瞬間、<br>境界がほどける。
+        <span>The moment it touches you, all boundaries dissolve.</span>
+      </h1>
+    </div>
+    <div class="fv-scroll">
+      <span>SCROLL</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ② ブランドストーリー -->
+  <section id="story">
+    <div class="story-visual">
+      <img src="story/12.png" alt="">
+    </div>
+    <div class="story-text">
+      <p class="section-label reveal">Brand Story</p>
+      <h2 class="story-heading reveal reveal-delay-1">
+        美しさは、<br>制御できない。
+      </h2>
+      <div class="gold-line reveal reveal-delay-2"></div>
+      <p class="story-body reveal reveal-delay-2">
+        整えることが美しさだと、誰が決めたのか。<br>
+        LOA OILは、既存の「美」へのアンチテーゼとして生まれた。<br><br>
+        妖艶さ、奥深さ、アンニュイ——<br>
+        相反するものが入り混じる、カオスな美の領域へ。<br><br>
+        これは、解放するための一滴。
+      </p>
+    </div>
+  </section>
+
+  <!-- ③ コンセプト -->
+  <section id="concept">
+    <div class="concept-header">
+      <p class="section-label reveal">Three Dimensions</p>
+      <h2 class="reveal reveal-delay-1">感情の、地図。</h2>
+    </div>
+    <div class="concept-grid">
+      <div class="concept-item">
+        <div class="bg-img"></div>
+        <p class="concept-number">01</p>
+        <h3 class="concept-word">Depth</h3>
+        <p class="concept-ja">奥深さ</p>
+        <p class="concept-desc">
+          表層に留まらない。<br>肌の深層へ、静かに、確実に。<br>
+          見えないところで起きる、静かな革命。
+        </p>
+      </div>
+      <div class="concept-item">
+        <div class="bg-img"></div>
+        <p class="concept-number">02</p>
+        <h3 class="concept-word">Ambiguity</h3>
+        <p class="concept-ja">曖昧さ</p>
+        <p class="concept-desc">
+          定義することを、拒む。<br>光でも影でもなく、その境界に宿る美。<br>
+          解釈は、あなたに委ねる。
+        </p>
+      </div>
+      <div class="concept-item">
+        <div class="bg-img"></div>
+        <p class="concept-number">03</p>
+        <h3 class="concept-word">Sensuality</h3>
+        <p class="concept-ja">官能</p>
+        <p class="concept-desc">
+          肌が覚えている、感覚がある。<br>塗るのではなく、溶け込む——<br>
+          その瞬間に、美は宿る。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ プロダクト提示 -->
+  <section id="product">
+    <div class="product-bg"></div>
+    <div class="product-content">
+      <p class="product-eyebrow reveal">The Product</p>
+      <h2 class="product-copy reveal reveal-delay-1">
+        これは、<br>美容液ではない。
+      </h2>
+      <p class="product-sub reveal reveal-delay-2">
+        定義できない領域へ。<br>
+        Beyond all definition.
+      </p>
+    </div>
+  </section>
+
+  <!-- ⑤ 使用体験 -->
+  <section id="texture">
+    <div class="texture-bg" id="textureBg"></div>
+    <div class="texture-overlay"></div>
+    <div class="texture-content">
+      <div class="texture-text">
+        <p class="section-label reveal">Sensory Experience</p>
+        <h2 class="texture-heading reveal reveal-delay-1">
+          肌が、<br>語り始める。
+        </h2>
+        <p class="texture-body reveal reveal-delay-2">
+          一滴が、肌に触れる瞬間。<br>
+          重力に逆らうように滴り、<br>
+          やがて肌と溶け合う。<br><br>
+          効果ではなく、感覚として。<br>
+          それが LOA OIL の体験。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑥ エビデンス -->
+  <section id="ingredient">
+    <div class="ingredient-visual reveal">
+      <img src="ingredient/16.png" alt="">
+    </div>
+    <div class="ingredient-text">
+      <p class="section-label reveal">Formulation</p>
+      <h2 class="ingredient-heading reveal reveal-delay-1">
+        極限まで、<br>精製された自然。
+      </h2>
+      <ul class="ingredient-list">
+        <li class="reveal reveal-delay-1">
+          <strong>DEEP PENETRATION COMPLEX</strong>
+          肌の深層へ静かに浸透する、独自複合成分。<br>
+          時間をかけて、内側から満たしていく。
+        </li>
+        <li class="reveal reveal-delay-2">
+          <strong>RARE BOTANICAL EXTRACT</strong>
+          厳選された希少植物由来エキス。<br>
+          自然の奥深さを、そのままに。
+        </li>
+        <li class="reveal reveal-delay-3">
+          <strong>SENSORY OIL MATRIX</strong>
+          感覚に響く、官能的なオイル構造。<br>
+          肌と一体化する、独自の処方。
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ⑦ 社会的証明 -->
+  <section id="testimonial">
+    <div class="testimonial-inner">
+      <div class="testimonial-visual">
+        <img src="model/17.png" alt="">
+      </div>
+      <div class="testimonial-text">
+        <p class="section-label reveal">Voice</p>
+        <blockquote class="testimonial-quote reveal reveal-delay-1">
+          「もう、戻れない。」
+        </blockquote>
+        <p class="testimonial-attr reveal reveal-delay-2">— 32歳、会社経営</p>
+        <div class="testimonial-sub reveal reveal-delay-3">
+          <p>
+            言葉にできない変化がある。<br>
+            何かが変わったとわかるのに、<br>
+            それが何なのか、説明できない。<br><br>
+            それで、いい。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑧ CTA -->
+  <section id="cta">
+    <div class="cta-bg"></div>
+    <div class="cta-overlay"></div>
+    <div class="cta-content">
+      <p class="cta-label reveal">Begin Here</p>
+      <h2 class="cta-copy reveal reveal-delay-1">
+        あなたの境界を、<br>ほどく。
+      </h2>
+      <p class="cta-price reveal reveal-delay-2">¥ — , — — —（税込）</p>
+      <a href="#" class="btn-primary reveal reveal-delay-3">体験する</a>
+    </div>
+  </section>
+
+  <!-- ⑨ 補足情報 -->
+  <section id="trust">
+    <div class="trust-inner">
+      <div class="trust-item reveal">
+        <p class="trust-icon">✦</p>
+        <p class="trust-title">無添加処方</p>
+        <p class="trust-desc">パラベン・合成香料・<br>合成着色料不使用</p>
+      </div>
+      <div class="trust-item reveal reveal-delay-1">
+        <p class="trust-icon">✦</p>
+        <p class="trust-title">国内製造</p>
+        <p class="trust-desc">日本国内の<br>GMP認定工場で製造</p>
+      </div>
+      <div class="trust-item reveal reveal-delay-2">
+        <p class="trust-icon">✦</p>
+        <p class="trust-title">30日間返金保証</p>
+        <p class="trust-desc">体験に満足いただけない場合は<br>全額返金いたします</p>
+      </div>
+      <div class="trust-item reveal reveal-delay-3">
+        <p class="trust-icon">✦</p>
+        <p class="trust-title">定期便あり</p>
+        <p class="trust-desc">継続利用で<br>特別価格にてお届け</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- フッター -->
+  <footer>
+    <p>© LOA OIL — All rights reserved.</p>
+  </footer>
+
+  <script>
+    // カスタムカーソル
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.transform = `translate(${mx - 4}px, ${my - 4}px)`;
+    });
+
+    function animateRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.transform = `translate(${rx - 16}px, ${ry - 16}px)`;
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    // FVロードアニメーション
+    window.addEventListener('load', () => {
+      document.getElementById('fv').classList.add('loaded');
+    });
+
+    // スクロールreveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(el => observer.observe(el));
+
+    // パララックス（テクスチャセクション）
+    const textureBg = document.getElementById('textureBg');
+    window.addEventListener('scroll', () => {
+      const section = document.getElementById('texture');
+      const rect = section.getBoundingClientRect();
+      const progress = -rect.top / (rect.height + window.innerHeight);
+      textureBg.style.transform = `scale(1.1) translateY(${progress * 40}px)`;
+    });
+  </script>
+</body>
+</html>
